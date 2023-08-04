@@ -265,7 +265,7 @@ static void setup_netplay()
 
     uint32_t settings_size = 4;
     char buffer[settings_size + 5];
-	buffer[0] = settings_slot; // send settings
+    buffer[0] = settings_slot; // send settings
     uint32_t swapped_size = SDL_SwapBE32(settings_size);
     memcpy(&buffer[1], &swapped_size, 4);
     memcpy(&buffer[5], &vk_ssreadbacks, 1);
