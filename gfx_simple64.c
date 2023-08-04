@@ -48,7 +48,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <SDL2/SDL.h>
 
 #include "gfx_simple64.h"
 #include "vkguts.h"
