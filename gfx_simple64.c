@@ -263,13 +263,16 @@ static void setup_netplay()
 {
     uint8_t settings_slot = 64;
 
-    uint32_t settings_size = 2;
+    uint32_t settings_size = 4;
     char buffer[settings_size + 5];
 	buffer[0] = settings_slot; // send settings
     uint32_t swapped_size = SDL_SwapBE32(settings_size);
     memcpy(&buffer[1], &swapped_size, 4);
     memcpy(&buffer[5], &vk_ssreadbacks, 1);
     memcpy(&buffer[6], &vk_ssdither, 1);
+    memcpy(&buffer[7], &vk_native_texture_lod, 1);
+    memcpy(&buffer[8], &vk_native_tex_rect, 1);
+
     m64p_error netplay_init = ConfigSendNetplayConfig(&buffer[0], sizeof(buffer));
 
     if (netplay_init == M64ERR_INVALID_STATE) { // we are not player 1, receive settings
@@ -278,6 +281,8 @@ static void setup_netplay()
 		ConfigReceiveNetplayConfig(&buffer[0], settings_size);
         memcpy(&vk_ssreadbacks, &buffer[0], 1);
         memcpy(&vk_ssdither, &buffer[1], 1);
+        memcpy(&vk_native_texture_lod, &buffer[2], 1);
+        memcpy(&vk_native_tex_rect, &buffer[3], 1);
         DebugMessage(M64MSG_INFO, "Received Parallel RDP settings via netplay");
     } else {
         DebugMessage(M64MSG_INFO, "Sent Parallel RDP settings via netplay");
