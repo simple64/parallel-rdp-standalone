@@ -268,7 +268,7 @@ static void setup_netplay()
     buffer[0] = settings_slot; // send settings
     uint32_t swapped_size = SDL_SwapBE32(settings_size);
     memcpy(&buffer[1], &swapped_size, 4);
-    memcpy(&buffer[5], &vk_ssreadbacks, 1);
+    //memcpy(&buffer[5], &vk_ssreadbacks, 1);
     memcpy(&buffer[6], &vk_ssdither, 1);
     memcpy(&buffer[7], &vk_native_texture_lod, 1);
     memcpy(&buffer[8], &vk_native_tex_rect, 1);
@@ -279,7 +279,7 @@ static void setup_netplay()
         buffer[0] = settings_slot + 64; // get gettings
         ConfigSendNetplayConfig(&buffer[0], 1);
         ConfigReceiveNetplayConfig(&buffer[0], settings_size);
-        memcpy(&vk_ssreadbacks, &buffer[0], 1);
+        //memcpy(&vk_ssreadbacks, &buffer[0], 1);
         memcpy(&vk_ssdither, &buffer[1], 1);
         memcpy(&vk_native_texture_lod, &buffer[2], 1);
         memcpy(&vk_native_tex_rect, &buffer[3], 1);
@@ -292,6 +292,7 @@ static void setup_netplay()
         DebugMessage(M64MSG_INFO, "Netplay enabled, disabling vsync");
         vk_synchronous = 1; // force synchronous rdp during netplay
         window_vsync = 0; // force disable vsync during netplay
+        vk_ssreadbacks = 0; // can cause desyncs
     }
 }
 
