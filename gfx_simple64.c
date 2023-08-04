@@ -276,6 +276,9 @@ static void setup_netplay()
 		ConfigReceiveNetplayConfig(&buffer[0], settings_size);
         memcpy(&vk_ssreadbacks, &buffer[0], 1);
         memcpy(&vk_ssdither, &buffer[1], 1);
+        DebugMessage(M64MSG_INFO, "Received Parallel RDP settings via netplay");
+    } else {
+        DebugMessage(M64MSG_INFO, "Sent Parallel RDP settings via netplay");
     }
 
     if (netplay_init != M64ERR_NOT_INIT && netplay_init != M64ERR_INCOMPATIBLE) { // netplay is enabled
