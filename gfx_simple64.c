@@ -48,6 +48,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <SDL2/SDL.h>
 
 #include "gfx_simple64.h"
 #include "vkguts.h"
@@ -265,7 +266,8 @@ static void setup_netplay()
     uint32_t settings_size = 2;
     char buffer[settings_size + 5];
 	buffer[0] = settings_slot; // send settings
-    memcpy(&buffer[1], &settings_size, 4);
+    uint32_t swapped_size = SDL_SwapBE32(settings_size);
+    memcpy(&buffer[1], &swapped_size, 4);
     memcpy(&buffer[5], &vk_ssreadbacks, 1);
     memcpy(&buffer[6], &vk_ssdither, 1);
     m64p_error netplay_init = ConfigSendNetplayConfig(&buffer[0], sizeof(buffer));
