@@ -278,7 +278,7 @@ static void setup_netplay()
     if (netplay_init == M64ERR_INVALID_STATE) { // we are not player 1, receive settings
         buffer[0] = settings_slot + 64; // get gettings
         ConfigSendNetplayConfig(&buffer[0], 1);
-		ConfigReceiveNetplayConfig(&buffer[0], settings_size);
+        ConfigReceiveNetplayConfig(&buffer[0], settings_size);
         memcpy(&vk_ssreadbacks, &buffer[0], 1);
         memcpy(&vk_ssdither, &buffer[1], 1);
         memcpy(&vk_native_texture_lod, &buffer[2], 1);
