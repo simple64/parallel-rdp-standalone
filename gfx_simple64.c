@@ -284,7 +284,7 @@ static void setup_netplay()
         memcpy(&vk_native_texture_lod, &buffer[2], 1);
         memcpy(&vk_native_tex_rect, &buffer[3], 1);
         DebugMessage(M64MSG_INFO, "Received Parallel RDP settings via netplay");
-    } else {
+    } else if (netplay_init == M64ERR_SUCCESS) {
         DebugMessage(M64MSG_INFO, "Sent Parallel RDP settings via netplay");
     }
 
