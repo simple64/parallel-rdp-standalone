@@ -69,7 +69,6 @@ static ptr_ConfigGetParamInt ConfigGetParamInt = NULL;
 static ptr_ConfigGetParamBool ConfigGetParamBool = NULL;
 static ptr_ConfigSetParameter ConfigSetParameter = NULL;
 static ptr_ConfigReceiveNetplayConfig ConfigReceiveNetplayConfig = NULL;
-static ptr_ConfigSendNetplayConfig ConfigSendNetplayConfig = NULL;
 
 static bool vk_initialized;
 static bool warn_hle;
@@ -156,7 +155,6 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Co
     ConfigGetParamBool = (ptr_ConfigGetParamBool)DLSYM(CoreLibHandle, "ConfigGetParamBool");
     ConfigSetParameter = (ptr_ConfigSetParameter)DLSYM(CoreLibHandle, "ConfigSetParameter");
     ConfigReceiveNetplayConfig = (ptr_ConfigReceiveNetplayConfig)DLSYM(CoreLibHandle, "ConfigReceiveNetplayConfig");
-    ConfigSendNetplayConfig = (ptr_ConfigSendNetplayConfig)DLSYM(CoreLibHandle, "ConfigSendNetplayConfig");
 
     ConfigOpenSection("Video-Parallel", &configVideoParallel);
     ConfigSetDefaultBool(configVideoParallel, KEY_FULLSCREEN, 0, "Use fullscreen mode if True, or windowed mode if False");
@@ -261,34 +259,9 @@ EXPORT void CALL FullSync(void)
 
 static void setup_netplay()
 {
-    uint8_t settings_slot = 64;
-
-    uint32_t settings_size = 4;
-    char buffer[settings_size + 5];
-    buffer[0] = settings_slot; // send settings
-    uint32_t swapped_size = SDL_SwapBE32(settings_size);
-    memcpy(&buffer[1], &swapped_size, 4);
-    //memcpy(&buffer[5], &vk_ssreadbacks, 1);
-    memcpy(&buffer[6], &vk_ssdither, 1);
-    memcpy(&buffer[7], &vk_native_texture_lod, 1);
-    memcpy(&buffer[8], &vk_native_tex_rect, 1);
-
-    m64p_error netplay_init = ConfigSendNetplayConfig(&buffer[0], sizeof(buffer));
-
-    if (netplay_init == M64ERR_INVALID_STATE) { // we are not player 1, receive settings
-        buffer[0] = settings_slot + 64; // get gettings
-        ConfigSendNetplayConfig(&buffer[0], 1);
-        ConfigReceiveNetplayConfig(&buffer[0], settings_size);
-        //memcpy(&vk_ssreadbacks, &buffer[0], 1);
-        memcpy(&vk_ssdither, &buffer[1], 1);
-        memcpy(&vk_native_texture_lod, &buffer[2], 1);
-        memcpy(&vk_native_tex_rect, &buffer[3], 1);
-        DebugMessage(M64MSG_INFO, "Received Parallel RDP settings via netplay");
-    } else if (netplay_init == M64ERR_SUCCESS) {
-        DebugMessage(M64MSG_INFO, "Sent Parallel RDP settings via netplay");
-    }
-
-    if (netplay_init != M64ERR_NOT_INIT && netplay_init != M64ERR_INCOMPATIBLE) { // netplay is enabled
+    m64p_error netplay_init = ConfigReceiveNetplayConfig(NULL, 0); // A bit of a hack to determine if netplay is enabled
+    if (netplay_init != M64ERR_NOT_INIT)
+    {
         DebugMessage(M64MSG_INFO, "Netplay enabled, disabling vsync");
         vk_synchronous = 1; // force synchronous rdp during netplay
         window_vsync = 0; // force disable vsync during netplay
